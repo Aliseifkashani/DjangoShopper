@@ -11,3 +11,6 @@ class User(models.Model):
     picture = models.CharField(max_length=300)
     asset = models.IntegerField()
     purchased = []
+
+    def __str__(self):
+        return self.firstName + ' ' + self.lastName
