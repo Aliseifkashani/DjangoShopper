@@ -23,6 +23,11 @@
         email : {{ user.email }}<br>
         asset : {{ user.asset }}<br>
         purchased : {{ user.purchased }}
+    </center><br>
+    <center>
+        <form action="{% url 'profile:update' user.id %}">
+            <input type="submit" value="Update">
+        </form>
     </center>
 </div>
 </body>
