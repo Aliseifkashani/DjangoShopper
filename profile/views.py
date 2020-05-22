@@ -1,7 +1,8 @@
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.urls import reverse
+import json
 
 from .models import User
 
@@ -36,4 +37,5 @@ def apply(request, user_id):
         user.email = new_email
         user.asset = new_asset
         user.save()
-    return HttpResponseRedirect(reverse('profile:profile', args=(user.id,)))
+    # return HttpResponseRedirect(reverse('profile:profile', args=(user.id,)))
+    return json.dumps(user)
