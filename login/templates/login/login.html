@@ -17,11 +17,11 @@
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
 <div>
-    <form action="{% url 'login:login_direct' user.id %}" method="post">
+    <form action="{% url 'login:login_direct' %}" method="post">
         {% csrf_token %}
         <center>
-            email : <input type="text" name="firstName">
-            password : <input type="text" name="lastName">
+            email : <input type="text" name="email">
+            password : <input type="text" name="password">
         </center>
         <center><input type="submit" value="Login/SignUp"></center>
     </form>

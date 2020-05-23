@@ -21,9 +21,8 @@
     <form action="{% url 'profile:apply' user.id %}" method="post">
         {% csrf_token %}
         <center>
-            firstName : <input type="text" name="firstName">
-            lastName : <input type="text" name="lastName">
             email : <input type="text" name="email">
+            password : <input type="password" name="password">
             asset : <input type="text" name="asset">
         </center>
         <center><input type="submit" value="Apply"></center>
