@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.tokens import default_token_generator
+
 from . import models
 from profile.models import User
 

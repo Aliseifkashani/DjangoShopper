@@ -9,6 +9,7 @@ class User(models.Model):
     # password = forms.CharField(max_length=30, widget=forms.PasswordInput)
     password = models.CharField(max_length=30)
     # picture = models.ImageField(upload_to='/profile/')
+    picture = models.CharField(max_length=300)
     asset = models.IntegerField()
     last_login = None
     purchased = []
