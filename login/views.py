@@ -1,13 +1,19 @@
-from django.http import HttpResponse
-from django.shortcuts import render
 from django.contrib.auth.tokens import default_token_generator
+from json import JSONEncoder
 
-from . import models
 from profile.models import User
 
 
+class MyEncoder(JSONEncoder):
+    def default(self, o):
+        return o.__dict__
+
+
 def index(request):
-    return render(request, 'login/login.html')
+    context = {
+        'users': User.objects.all()
+    }
+    return MyEncoder().encode(context)
 
 
 def login_direct(request):
@@ -15,10 +21,16 @@ def login_direct(request):
         user = User(email=request.POST['email'], password=request.POST['password'], asset=0)
         user.save()
         user.last_login = default_token_generator.make_token(user)
-        return user.last_login
+        context = {user.last_login}
+        return MyEncoder().encode(context)
     else:
         if request.POST['password'] == User.objects.get(email=request.POST['email']).password:
             user = User.objects.get(email=request.POST['email'], password=request.POST['password'])
-            return user.last_login
+            context = {user.last_login}
+            return MyEncoder().encode(context)
         else:
-            return render(request, 'login/login.html', {'error_message': 'invalid password'})
+            context = {
+                'error_message': 'invalid password',
+                'users': User.objects.all()
+            }
+            return MyEncoder().encode(context)
