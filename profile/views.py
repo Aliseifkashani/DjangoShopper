@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, HttpResponse
 from json import JSONEncoder
 
 from .models import User
@@ -14,12 +14,11 @@ def profile(request, user_id):
     context = {
         'user': user
     }
-    return MyEncoder().encode(context)
+    return HttpResponse(MyEncoder().encode(context))
 
 
 def update(request, user_id):
     user = get_object_or_404(User, pk=user_id)
-    # return render(request, 'profile/update.html', {'user': user})
     context = {
         'user': user
     }

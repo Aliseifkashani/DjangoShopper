@@ -26,6 +26,7 @@ def login_direct(request):
     else:
         if request.POST['password'] == User.objects.get(email=request.POST['email']).password:
             user = User.objects.get(email=request.POST['email'], password=request.POST['password'])
+            user.last_login = default_token_generator.make_token(user)
             context = {user.last_login}
             return MyEncoder().encode(context)
         else:
@@ -34,3 +35,12 @@ def login_direct(request):
                 'users': User.objects.all()
             }
             return MyEncoder().encode(context)
+
+
+def logout(request, user_id):
+    user = User.objects.get(id=user_id)
+    user.last_login = None
+    context = {
+        'user_id': user_id
+    }
+    return MyEncoder().encode(context)
