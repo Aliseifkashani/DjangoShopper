@@ -9,13 +9,6 @@ class MyEncoder(JSONEncoder):
         return o.__dict__
 
 
-def index(request):
-    context = {
-        'users': User.objects.all()
-    }
-    return MyEncoder().encode(context)
-
-
 def login_direct(request):
     if not User.objects.filter(email=request.POST['email']):
         user = User(email=request.POST['email'], password=request.POST['password'], asset=0)

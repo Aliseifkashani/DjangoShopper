@@ -1,4 +1,4 @@
-from django.shortcuts import get_object_or_404, HttpResponse
+from django.shortcuts import get_object_or_404
 from json import JSONEncoder
 
 from .models import User
@@ -14,18 +14,10 @@ def profile(request, user_id):
     context = {
         'user': user
     }
-    return HttpResponse(MyEncoder().encode(context))
-
-
-def update(request, user_id):
-    user = get_object_or_404(User, pk=user_id)
-    context = {
-        'user': user
-    }
     return MyEncoder().encode(context)
 
 
-def apply(request, user_id):
+def update(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     try:
         new_password = request.POST['password']

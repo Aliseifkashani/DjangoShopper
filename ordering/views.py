@@ -9,13 +9,6 @@ class MyEncoder(JSONEncoder):
         return o.__dict__
 
 
-def index(request):
-    context = {
-        'commidities': Commidity.objects.exclude(number=0)
-    }
-    return MyEncoder().encode(context)
-
-
 def buy(requset, product_ids, user_id):
     sum = 0
     for product_id in product_ids:
@@ -42,8 +35,3 @@ def buy(requset, product_ids, user_id):
         'user_id': user_id,
     }
     return MyEncoder().encode(context)
-
-
-
-
-
