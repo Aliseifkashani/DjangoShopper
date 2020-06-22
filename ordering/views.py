@@ -1,7 +1,9 @@
 from json import JSONEncoder
+from django.http import HttpResponse
 
 from .models import Commidity
 from profile.models import User
+from login.models import all_tokens
 
 
 class MyEncoder(JSONEncoder):
@@ -9,7 +11,27 @@ class MyEncoder(JSONEncoder):
         return o.__dict__
 
 
-def buy(requset, product_ids, user_id):
+def view(request):
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
+        if token not in all_tokens:
+            raise Exception
+        context = {
+            'commidities': Commidity.objects.all()
+        }
+        return MyEncoder().encode(context)
+    except Exception:
+        return HttpResponse('Unauthorized', status=401)
+
+
+def buy(request, product_ids):
+    try:
+        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
+        if token not in all_tokens:
+            raise Exception
+    except Exception:
+        return HttpResponse('Unauthorized', status=401)
+    user_id = all_tokens[token]
     sum = 0
     for product_id in product_ids:
         if not Commidity.objects.filter(id=product_id):
