@@ -38,7 +38,6 @@ def buy(request, product_ids):
             context = {
                 'commidities': Commidity.objects.exclude(number=0),
                 'error_message': 'invalid product',
-                'user_id': user_id
             }
             return MyEncoder().encode(context)
         sum += Commidity.objects.get(id=product_id)
@@ -47,13 +46,11 @@ def buy(request, product_ids):
         context = {
             'commidities': Commidity.objects.exclude(number=0),
             'error_message': 'no enough money to buy these',
-            'user_id': user_id
         }
         return MyEncoder().encode(context)
 
     User.objects.get(user_id).asset -= sum
     context = {
         'commidities': Commidity.objects.exclude(number=0),
-        'user_id': user_id,
     }
     return MyEncoder().encode(context)

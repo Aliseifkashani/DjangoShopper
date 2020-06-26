@@ -34,9 +34,8 @@ def login_direct(request):
         else:
             context = {
                 'error_message': 'invalid password',
-                'users': User.objects.all()
             }
-            return MyEncoder().encode(context)  # من نباید یک ویویی رو هم مشخص کنم برای خروجی؟
+            return MyEncoder().encode(context)
 
 
 def logout(request):
