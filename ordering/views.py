@@ -2,8 +2,7 @@ from json import JSONEncoder
 from django.http import HttpResponse
 
 from .models import Commidity
-from profile.models import User
-from login.models import all_tokens
+from prof.models import User
 
 
 class MyEncoder(JSONEncoder):

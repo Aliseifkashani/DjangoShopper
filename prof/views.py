@@ -2,7 +2,6 @@ from django.http import HttpResponse
 from json import JSONEncoder
 
 from .models import User
-from login.models import all_tokens
 
 
 class MyEncoder(JSONEncoder):

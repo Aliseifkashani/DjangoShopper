@@ -20,8 +20,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
-    'login.apps.LoginConfig',
-    'profile.apps.ProfileConfig',
+    'log.apps.LoginConfig',
+    'prof.apps.ProfConfig',
     'ordering.apps.OrderingConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
