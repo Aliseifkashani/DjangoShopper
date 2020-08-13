@@ -1,55 +1,29 @@
-from json import JSONEncoder
 from django.http import HttpResponse
+import ast
+from rest_framework.authtoken.models import Token
 
 from .models import Commidity
-from prof.models import User
+from nilva.general import request_decorator, MyEncoder
 
 
-class MyEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+@request_decorator
+def view_products(request):
+    return MyEncoder().encode({'commidities': Commidity.objects.all()})  # need to check
 
 
-def view(request):
-    try:
-        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
-        if token not in all_tokens:
-            raise Exception
-        context = {
-            'commidities': Commidity.objects.all()
-        }
-        return MyEncoder().encode(context)
-    except Exception:
-        return HttpResponse('Unauthorized', status=401)
-
-
-def buy(request, product_ids):
-    try:
-        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
-        if token not in all_tokens:
-            raise Exception
-    except Exception:
-        return HttpResponse('Unauthorized', status=401)
-    user_id = all_tokens[token]
+@request_decorator
+def buy(request):
+    dict_str = request.body.decode("UTF-8")
+    body = ast.literal_eval(dict_str)
     sum = 0
-    for product_id in product_ids:
+    for product_id in body['product_ids']:
         if not Commidity.objects.filter(id=product_id):
-            context = {
-                'commidities': Commidity.objects.exclude(number=0),
-                'error_message': 'invalid product',
-            }
-            return MyEncoder().encode(context)
+            error = {'error': 'invalid product with id=' + str(product_id)}
+            return HttpResponse(MyEncoder().encode(error))
         sum += Commidity.objects.get(id=product_id)
-
-    if sum > User.objects.get(user_id).asset:
-        context = {
-            'commidities': Commidity.objects.exclude(number=0),
-            'error_message': 'no enough money to buy these',
-        }
-        return MyEncoder().encode(context)
-
-    User.objects.get(user_id).asset -= sum
-    context = {
-        'commidities': Commidity.objects.exclude(number=0),
-    }
-    return MyEncoder().encode(context)
+    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+    if sum > user.asset:
+        error = {'error': 'no enough money to buy those!'}
+        return HttpResponse(MyEncoder().encode(error))
+    user.asset -= sum
+    return MyEncoder().encode('Successful purchase')

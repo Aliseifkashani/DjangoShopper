@@ -5,6 +5,7 @@ from . import views
 app_name = 'log'
 
 urlpatterns = [
-    path('in(direct)/', views.direct, name='direct'),
+    path('in_direct/', views.direct, name='direct'),
     path('out/', views.logout, name='logout'),
+    path('test/', views.test),
 ]

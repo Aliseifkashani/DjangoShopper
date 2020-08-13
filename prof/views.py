@@ -1,43 +1,51 @@
-from django.http import HttpResponse
-from json import JSONEncoder
+import ast
+from rest_framework.authtoken.models import Token
 
-from .models import User
-
-
-class MyEncoder(JSONEncoder):
-    def default(self, o):
-        return o.__dict__
+from nilva.general import request_decorator, MyEncoder
 
 
+@request_decorator
 def profile(request):
-    try:
-        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
-        if token not in all_tokens:
-            raise Exception
-    except Exception:
-        return HttpResponse('Unauthorized', status=401)
-    user_id = all_tokens[token]
-    context = {
-        'user_id': user_id
+    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+    properties = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'username': user.username,
+        'email': user.email,
+        'asset': user.asset,
+        'purchased': user.purchased,
+        'picture': user.picture.path  # Is it correct to passing the path?
     }
-    return MyEncoder().encode(context)
+    return MyEncoder().encode(properties)
 
 
+@request_decorator
 def update(request):
-    try:
-        token = request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]
-        if token not in all_tokens:
-            raise Exception
-    except Exception:
-        return HttpResponse('Unauthorized', status=401)
-    user_id = all_tokens[token]
-    user = User.objects.get(id=user_id)
-    user.email = request.POST['email']
-    user.password = request.POST['password']
-    user.asset = int(request.POST['asset'])
+    dict_str = request.body.decode("UTF-8")
+    body = ast.literal_eval(dict_str)
+    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+    if 'first_name' in body:
+        user.first_name = body['first_name']
+    if 'last_name' in body:
+        user.last_name = body['last_name']
+    if 'username' in body:
+        user.username = body['username']
+    if 'password' in body:
+        user.password = body['password']
+    if 'email' in body:
+        user.email = body['email']
+    if 'asset' in body:
+        user.username = int(body['asset'])
+    if 'picture' in body:
+        user.picture.path = body['picture']  # Is it corrct?
     user.save()
-    context = {
-        'user_id': user_id
+    properties = {
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+        'username': user.username,
+        'email': user.email,
+        'asset': user.asset,
+        'purchased': user.purchased,
+        'picture': user.picture
     }
-    return MyEncoder().encode(context)
-
+    return MyEncoder().encode(properties)
