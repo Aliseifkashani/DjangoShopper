@@ -1,7 +1,8 @@
 import ast
+from django.http import JsonResponse
 from rest_framework.authtoken.models import Token
 
-from nilva.general import request_decorator, MyEncoder
+from nilva.general import request_decorator
 
 
 @request_decorator
@@ -16,7 +17,7 @@ def profile(request):
         'purchased': user.purchased,
         'picture': user.picture.path  # Is it correct to passing the path?
     }
-    return MyEncoder().encode(properties)
+    return JsonResponse(properties, safe=False)
 
 
 @request_decorator
@@ -48,4 +49,4 @@ def update(request):
         'purchased': user.purchased,
         'picture': user.picture
     }
-    return MyEncoder().encode(properties)
+    return JsonResponse(properties, safe=False)

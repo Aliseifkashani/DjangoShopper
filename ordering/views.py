@@ -1,14 +1,16 @@
-from django.http import HttpResponse
+from django.http import JsonResponse
 import ast
 from rest_framework.authtoken.models import Token
+from django.core import serializers
 
 from .models import Commidity
-from nilva.general import request_decorator, MyEncoder
+from nilva.general import request_decorator
 
 
 @request_decorator
 def view_products(request):
-    return MyEncoder().encode({'commidities': Commidity.objects.all()})  # need to check
+    data = serializers.serialize('json', Commidity.objects.all())
+    return JsonResponse(data, safe=False)
 
 
 @request_decorator
@@ -18,12 +20,10 @@ def buy(request):
     sum = 0
     for product_id in body['product_ids']:
         if not Commidity.objects.filter(id=product_id):
-            error = {'error': 'invalid product with id=' + str(product_id)}
-            return HttpResponse(MyEncoder().encode(error))
+            return JsonResponse('invalid product with id=' + str(product_id), safe=False)
         sum += Commidity.objects.get(id=product_id)
     user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
     if sum > user.asset:
-        error = {'error': 'no enough money to buy those!'}
-        return HttpResponse(MyEncoder().encode(error))
+        return JsonResponse('no enough money to buy those!', safe=False)
     user.asset -= sum
-    return MyEncoder().encode('Successful purchase')
+    return JsonResponse('Successful purchase', safe=False)

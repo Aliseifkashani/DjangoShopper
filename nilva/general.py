@@ -1,7 +1,7 @@
 from json import JSONEncoder
 import ast
 from rest_framework.authtoken.models import Token
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 from prof.models import User
 
@@ -18,41 +18,32 @@ def request_decorator(func):
         if 'Authorization' in request.headers and func.__name__ != 'direct':
             if not (request.headers['Authorization'] is None or request.headers['Authorization'] == ''):
                 if not request.headers['Authorization'].startswith('Token '):
-                    error = {'error': 'invalid authorization format!'}
-                    return HttpResponse(MyEncoder().encode(error))
+                    return JsonResponse('invalid authorization format!', safe=False)
                 if not Token.objects.filter(key=request.headers['Authorization']):
                     return HttpResponse('Unauthorized', status=401)
         if 'username' in body:
             if body['username'] is None or body['username'] == '' and func.__name__ in ['direct', 'update']:
-                error = {'error': 'empty username!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('empty username!', safe=False)
             if not User.objects.filter(username=body['username']) and func.__name__ not in ['direct', 'update']:
-                error = {'error': 'invalid username!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('invalid username!', safe=False)
         if 'password' in body:
             if body['password'] is None or body['password'] == '' and func.__name__ in ['direct', 'update']:
-                error = {'error': 'empty password!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('empty password!', safe=False)
             if not User.objects.filter(password=body['password']) and func.__name__ not in ['direct', 'update']:
-                error = {'error': 'invalid password!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('invalid password!', safe=False)
         if 'user_id' in body:
             # if body['user_id'] is None or body['user_id'] == '':
             #     error = {'error': 'empty user_id!'}
             #     return HttpResponse(MyEncoder().encode(error))
             if not User.objects.filter(user_id=body['user_id']) and func.__name__ != 'update':
-                error = {'error': 'invalid user_id!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('invalid user_id!', safe=False)
         if 'email' in body:
             if body['email'] is None or body['email'] == '' and func.__name__ == 'update':
-                error = {'error': 'empty email!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('empty email!', safe=False)
             if not User.objects.filter(email=body['email']) and func.__name__ != 'update':
-                error = {'error': 'invalid email!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('invalid email!', safe=False)
         if 'product_ids' in body:
             if len(body['product_ids'] == 0):
-                error = {'error': 'empty shopping cart!'}
-                return HttpResponse(MyEncoder().encode(error))
+                return JsonResponse('empty shopping cart!', safe=False)
         return func(request)
     return check
