@@ -1,13 +1,14 @@
 import ast
 from django.http import JsonResponse
-from rest_framework.authtoken.models import Token
 
-from nilva.general import request_decorator
+from nilva.general import request_decorator, all_tokens
+from prof.models import User
 
 
 @request_decorator
 def profile(request):
-    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+    token = request.headers['Authorization'].replace('Token ', '', 1)
+    user = User.objects.get(id=all_tokens[token])
     properties = {
         'first_name': user.first_name,
         'last_name': user.last_name,
@@ -24,7 +25,8 @@ def profile(request):
 def update(request):
     dict_str = request.body.decode("UTF-8")
     body = ast.literal_eval(dict_str)
-    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+    token = request.headers['Authorization'].replace('Token ', '', 1)
+    user = User.objects.get(id=all_tokens[token])
     if 'first_name' in body:
         user.first_name = body['first_name']
     if 'last_name' in body:

@@ -3,7 +3,10 @@ import ast
 from rest_framework.authtoken.models import Token
 from django.http import HttpResponse, JsonResponse
 
+from ordering.models import Commidity
 from prof.models import User
+
+all_tokens = {}
 
 
 class MyEncoder(JSONEncoder):
@@ -19,7 +22,7 @@ def request_decorator(func):
             if not (request.headers['Authorization'] is None or request.headers['Authorization'] == ''):
                 if not request.headers['Authorization'].startswith('Token '):
                     return JsonResponse('invalid authorization format!', safe=False)
-                if not Token.objects.filter(key=request.headers['Authorization']):
+                if not Token.objects.filter(key=request.headers['Authorization'].replace('Token ', '', 1)):
                     return HttpResponse('Unauthorized', status=401)
         if 'username' in body:
             if body['username'] is None or body['username'] == '' and func.__name__ in ['direct', 'update']:
@@ -43,7 +46,12 @@ def request_decorator(func):
             if not User.objects.filter(email=body['email']) and func.__name__ != 'update':
                 return JsonResponse('invalid email!', safe=False)
         if 'product_ids' in body:
-            if len(body['product_ids'] == 0):
+            if len(body['product_ids']) == 0:
                 return JsonResponse('empty shopping cart!', safe=False)
+            for product_id in body['product_ids']:
+                if not Commidity.objects.filter(id=product_id):
+                    return JsonResponse('invalid product (id)!', safe=False)
+                if Commidity.objects.get(id=product_id).number <= 0:
+                    return JsonResponse('inadequate amount of this commidity!', safe=False)
         return func(request)
     return check

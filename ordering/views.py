@@ -1,10 +1,10 @@
-from django.http import JsonResponse
 import ast
-from rest_framework.authtoken.models import Token
 from django.core import serializers
+from django.http import JsonResponse
 
 from .models import Commidity
-from nilva.general import request_decorator
+from prof.models import User
+from nilva.general import request_decorator, all_tokens
 
 
 @request_decorator
@@ -19,11 +19,15 @@ def buy(request):
     body = ast.literal_eval(dict_str)
     sum = 0
     for product_id in body['product_ids']:
-        if not Commidity.objects.filter(id=product_id):
-            return JsonResponse('invalid product with id=' + str(product_id), safe=False)
-        sum += Commidity.objects.get(id=product_id)
-    user = Token.objects.get(key=request.headers['Authorization'].replace('token', '', 1)).user
+        sum += Commidity.objects.get(id=product_id).price
+    # user = Token.objects.get(key=request.headers['Authorization'].replace('Token ', '', 1)).user
+    token = request.headers['Authorization'].replace('Token ', '', 1)
+    user = User.objects.get(id=all_tokens[token])
     if sum > user.asset:
         return JsonResponse('no enough money to buy those!', safe=False)
     user.asset -= sum
+    for product_id in body['product_ids']:
+        commidity = Commidity.objects.get(id=product_id)
+        commidity.number -= 1
+    user.save()
     return JsonResponse('Successful purchase', safe=False)
